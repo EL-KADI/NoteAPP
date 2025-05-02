@@ -1,4 +1,9 @@
-import { Route, Routes, Navigate, HashRouter } from "react-router-dom";
+import {
+  createHashRouter,
+  RouterProvider,
+  Outlet,
+  Navigate,
+} from "react-router-dom";
 import { useAuth } from "./context/AuthContext.jsx";
 import Home from "./pages/Home.jsx";
 import Login from "./pages/Login.jsx";
@@ -17,30 +22,48 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-function App() {
+const Layout = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow">
-        <HashRouter>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <Home />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </HashRouter>
+        <Outlet />
       </main>
       <Footer />
     </div>
   );
+};
+
+const router = createHashRouter([
+  {
+    element: <Layout />,
+    children: [
+      {
+        path: "/",
+        element: (
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      {
+        path: "/register",
+        element: <Register />,
+      },
+      {
+        path: "*",
+        element: <NotFound />,
+      },
+    ],
+  },
+]);
+
+function App() {
+  return <RouterProvider router={router} />;
 }
 
 export default App;
